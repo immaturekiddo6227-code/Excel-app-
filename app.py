@@ -5,6 +5,11 @@ import plotly.express as px
 import streamlit as st
 import requests
 
+# Chart palette: emerald/mint first, then distinct supporting hues for readability
+CHART_COLORWAY = ["#34d399", "#2dd4bf", "#a3e635", "#38bdf8", "#fbbf24", "#a78bfa", "#fb7185", "#94a3b8"]
+px.defaults.template = "plotly_dark"
+px.defaults.color_discrete_sequence = CHART_COLORWAY
+
 st.set_page_config(page_title="Excel AI Studio", page_icon="📊", layout="wide", initial_sidebar_state="expanded")
 st.markdown(
     """
@@ -51,23 +56,41 @@ st.markdown(
 # --- Excel AI Studio: Aurora Glass UI ---
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 :root {
-    --mint: #65f5c0;
-    --violet: #a78bfa;
-    --text: #f4f7ff;
-    --muted: #a8b5cc;
-    --border: rgba(167, 190, 220, .16);
+    /* Emerald + mint design tokens */
+    --bg: #06100d;
+    --surface: #0b1a15;
+    --surface-2: #0e1e1a;
+    --border: rgba(167, 243, 208, .13);
+    --border-strong: rgba(110, 231, 183, .34);
+    --text: #ecf6f1;
+    --text-2: #c9ddd4;
+    --muted: #8fa89d;
+    --emerald-600: #059669;
+    --emerald-500: #10b981;
+    --emerald-400: #34d399;
+    --mint-300: #6ee7b7;
+    --mint-200: #a7f3d0;
+    --ring: rgba(52, 211, 153, .32);
+    --font: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --ease: cubic-bezier(.2, .7, .2, 1);
 }
 
 .stApp {
     color: var(--text);
     background:
-        radial-gradient(ellipse at 12% 0%, rgba(48, 210, 165, .12), transparent 33%),
-        radial-gradient(ellipse at 90% 8%, rgba(137, 92, 255, .15), transparent 32%),
-        linear-gradient(rgba(130, 155, 200, .025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(130, 155, 200, .025) 1px, transparent 1px),
-        #090e1b;
+        radial-gradient(ellipse 60% 40% at 8% -5%, rgba(16, 185, 129, .15), transparent 62%),
+        radial-gradient(ellipse 50% 35% at 96% 0%, rgba(52, 211, 153, .07), transparent 62%),
+        linear-gradient(rgba(167, 243, 208, .018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(167, 243, 208, .018) 1px, transparent 1px),
+        var(--bg);
     background-size: auto, auto, 34px 34px, 34px 34px, auto;
+}
+
+::selection {
+    background: rgba(52, 211, 153, .3);
 }
 
 .block-container {
@@ -118,14 +141,423 @@ div[data-testid="stToolbar"] {
 }
 /* Sidebar */
 [data-testid="stSidebar"] {
-    background: linear-gradient(165deg, #111a2d, #0b1120 75%);
+    background: linear-gradient(170deg, #0c1c17 0%, #07130f 80%);
     border-right: 1px solid var(--border);
 }
 
-[data-testid="stSidebar"] h2,
-[data-testid="stSidebar"] h3 {
-    color: #f2f5ff;
-    letter-spacing: -.3px;
+[data-testid="stSidebar"] [data-testid="stHeading"] h3,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
+    color: var(--mint-200);
+    font-size: 1.02rem;
+    font-weight: 650;
+    letter-spacing: -.005em;
+}
+
+/* ---------- Typography ---------- */
+.stApp :is(button, input, textarea, select, label,
+           [data-baseweb="tab"], [data-baseweb="select"],
+           [data-testid="stCaptionContainer"], [data-testid="stHeading"],
+           [data-testid="stMetric"], [data-testid="stAlert"],
+           [data-testid="stToast"], [data-testid="stExpander"] summary),
+[data-testid="stMarkdownContainer"]:not(:has(.hero)),
+[data-baseweb="popover"] :is(li, [role="option"]) {
+    font-family: var(--font);
+}
+
+[data-testid="stMarkdownContainer"]:not(:has(.hero)) h3,
+[data-testid="stHeading"] h3 {
+    color: var(--text);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -.015em;
+    line-height: 1.3;
+    padding: .35rem 0 .6rem;
+}
+
+[data-testid="stMarkdownContainer"]:not(:has(.hero)) strong {
+    color: #f6fcf9;
+    font-weight: 650;
+}
+
+[data-testid="stMarkdownContainer"]:not(:has(.hero)) a,
+[data-testid="stCaptionContainer"] a {
+    color: var(--mint-300);
+    text-decoration-color: rgba(110, 231, 183, .4);
+    text-underline-offset: 3px;
+    transition: color .18s ease, text-decoration-color .18s ease;
+}
+
+[data-testid="stMarkdownContainer"]:not(:has(.hero)) a:hover,
+[data-testid="stCaptionContainer"] a:hover {
+    color: var(--mint-200);
+    text-decoration-color: currentColor;
+}
+
+[data-testid="stMarkdownContainer"]:not(:has(.hero)) li::marker {
+    color: var(--emerald-400);
+}
+
+[data-testid="stMarkdownContainer"]:not(:has(.hero)) code {
+    padding: .1em .4em;
+    border-radius: 6px;
+    color: var(--mint-200);
+    background: rgba(16, 185, 129, .12);
+}
+
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] p {
+    color: var(--muted);
+    font-size: .86rem;
+    line-height: 1.5;
+}
+
+[data-testid="stWidgetLabel"] p {
+    color: var(--text-2);
+    font-size: .88rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+}
+
+.stApp hr {
+    border-color: var(--border);
+}
+
+/* ---------- Metric cards ---------- */
+div[data-testid="stMetric"] {
+    padding: 1.05rem 1.2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: linear-gradient(150deg, rgba(19, 40, 34, .85), rgba(10, 24, 19, .92));
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .18),
+                inset 0 1px 0 rgba(255, 255, 255, .03);
+    transition: transform .22s var(--ease),
+                border-color .22s ease,
+                box-shadow .22s ease;
+}
+
+div[data-testid="stMetric"]:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .24);
+}
+
+div[data-testid="stMetricLabel"],
+div[data-testid="stMetricLabel"] p {
+    color: var(--muted);
+    font-size: .84rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+}
+
+div[data-testid="stMetricValue"] {
+    color: #fff;
+    font-weight: 750;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Buttons ---------- */
+.stButton > button,
+.stDownloadButton > button,
+[data-testid="stFileUploaderDropzone"] button {
+    min-height: 44px;
+    padding: .5rem 1.1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-strong);
+    background: rgba(255, 255, 255, .035);
+    color: var(--text);
+    font-size: .93rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: .005em;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .18),
+                inset 0 1px 0 rgba(255, 255, 255, .04);
+    transition: transform .18s var(--ease),
+                box-shadow .18s ease,
+                border-color .18s ease,
+                background-color .18s ease,
+                color .18s ease,
+                filter .18s ease;
+}
+
+.stButton > button p,
+.stDownloadButton > button p {
+    margin: 0;
+    color: inherit;
+    font-weight: inherit;
+}
+
+.stButton > button:hover:not(:disabled),
+.stDownloadButton > button:hover:not(:disabled),
+[data-testid="stFileUploaderDropzone"] button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(52, 211, 153, .65);
+    background: rgba(16, 185, 129, .12);
+    color: #f4fcf8;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .26);
+}
+
+.stButton > button:active:not(:disabled),
+.stDownloadButton > button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .22);
+}
+
+.stButton > button:focus-visible,
+.stDownloadButton > button:focus-visible,
+[data-testid="stFileUploaderDropzone"] button:focus-visible {
+    outline: 2px solid var(--emerald-400);
+    outline-offset: 2px;
+}
+
+.stButton > button:disabled,
+.stDownloadButton > button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Primary actions */
+.stButton > button[kind="primary"],
+.stButton > button[data-testid="stBaseButton-primary"] {
+    color: #04140d;
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    border-color: rgba(110, 231, 183, .55);
+    box-shadow: 0 6px 18px rgba(16, 185, 129, .22),
+                inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+
+.stButton > button[kind="primary"]:hover:not(:disabled),
+.stButton > button[data-testid="stBaseButton-primary"]:hover:not(:disabled) {
+    color: #04140d;
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    border-color: rgba(167, 243, 208, .8);
+    filter: brightness(1.07);
+    box-shadow: 0 10px 26px rgba(16, 185, 129, .3);
+}
+
+/* ---------- Inputs ---------- */
+[data-testid="stTextInput"] [data-baseweb="input"],
+[data-testid="stTextArea"] [data-baseweb="textarea"],
+[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div {
+    background-color: rgba(255, 255, 255, .035);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: border-color .18s ease,
+                box-shadow .18s ease,
+                background-color .18s ease;
+}
+
+[data-testid="stTextInput"] [data-baseweb="base-input"],
+[data-testid="stTextArea"] [data-baseweb="base-input"],
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea {
+    background-color: transparent;
+    color: var(--text);
+}
+
+[data-testid="stTextInput"] input::placeholder,
+[data-testid="stTextArea"] textarea::placeholder {
+    color: var(--muted);
+    opacity: .8;
+}
+
+[data-testid="stTextInput"] [data-baseweb="input"]:hover,
+[data-testid="stTextArea"] [data-baseweb="textarea"]:hover,
+[data-testid="stSelectbox"] [data-baseweb="select"] > div:hover,
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div:hover {
+    border-color: var(--border-strong);
+}
+
+[data-testid="stTextInput"] [data-baseweb="input"]:focus-within,
+[data-testid="stTextArea"] [data-baseweb="textarea"]:focus-within,
+[data-testid="stSelectbox"] [data-baseweb="select"] > div:focus-within,
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div:focus-within {
+    border-color: var(--emerald-400);
+    background-color: rgba(16, 185, 129, .05);
+    box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* Dropdown menus */
+[data-baseweb="popover"] [data-baseweb="menu"],
+[data-baseweb="popover"] ul[role="listbox"] {
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
+}
+
+[data-baseweb="popover"] li[role="option"] {
+    transition: background-color .15s ease;
+}
+
+[data-baseweb="popover"] li[role="option"]:hover,
+[data-baseweb="popover"] li[role="option"][aria-selected="true"] {
+    background-color: rgba(16, 185, 129, .16);
+}
+
+/* Multi-select tags */
+span[data-baseweb="tag"] {
+    background-color: rgba(16, 185, 129, .18);
+    border-radius: 8px;
+    color: var(--mint-200);
+}
+
+span[data-baseweb="tag"] span {
+    color: inherit;
+}
+
+/* Checkboxes and radios */
+[data-testid="stCheckbox"] label,
+[data-testid="stRadio"] label {
+    transition: color .18s ease;
+}
+
+[data-testid="stCheckbox"] label:hover,
+[data-testid="stRadio"] label:hover {
+    color: var(--mint-200);
+}
+
+/* ---------- Tabs ---------- */
+[data-baseweb="tab-list"] {
+    gap: .25rem;
+}
+
+div[data-baseweb="tab-border"] {
+    background-color: var(--border);
+}
+
+button[data-baseweb="tab"] {
+    padding: .65rem 1rem;
+    border-radius: 10px 10px 0 0;
+    color: var(--muted);
+    font-weight: 600;
+    transition: color .2s ease, background-color .2s ease;
+}
+
+button[data-baseweb="tab"]:hover {
+    color: var(--text);
+    background-color: rgba(16, 185, 129, .06);
+}
+
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: var(--mint-300);
+}
+
+button[data-baseweb="tab"]:focus-visible {
+    outline: 2px solid var(--emerald-400);
+    outline-offset: -2px;
+}
+
+div[data-baseweb="tab-highlight"] {
+    background: linear-gradient(90deg, var(--emerald-500), var(--mint-300));
+    height: 3px;
+    border-radius: 99px;
+}
+
+/* ---------- Data tables ---------- */
+[data-testid="stDataFrame"],
+[data-testid="stDataEditor"] {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
+    transition: border-color .2s ease;
+}
+
+[data-testid="stDataFrame"]:hover,
+[data-testid="stDataEditor"]:hover {
+    border-color: var(--border-strong);
+}
+
+/* ---------- Expanders ---------- */
+[data-testid="stExpander"] {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(13, 28, 23, .55);
+    overflow: hidden;
+}
+
+[data-testid="stExpander"] summary {
+    font-weight: 600;
+    transition: background-color .18s ease, color .18s ease;
+}
+
+[data-testid="stExpander"] summary:hover {
+    color: var(--mint-300);
+    background-color: rgba(16, 185, 129, .06);
+}
+
+/* ---------- File upload ---------- */
+[data-testid="stFileUploader"] {
+    padding: 10px;
+    border: 1px dashed rgba(52, 211, 153, .4);
+    border-radius: 16px;
+    background: rgba(16, 185, 129, .04);
+    transition: border-color .2s ease, background-color .2s ease;
+}
+
+[data-testid="stFileUploader"]:hover {
+    border-color: var(--emerald-400);
+    background: rgba(16, 185, 129, .08);
+}
+
+[data-testid="stFileUploaderDropzone"] {
+    background: transparent;
+    border-radius: 12px;
+}
+
+/* ---------- Status messages ---------- */
+[data-testid="stAlert"] > div,
+[data-testid="stAlert"] [data-baseweb="notification"] {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background-color: rgba(255, 255, 255, .04);
+}
+
+[data-testid="stAlert"] p {
+    color: var(--text);
+}
+
+[data-testid="stAlert"] [data-baseweb="notification"]:has([data-testid="stAlertContentSuccess"]) {
+    background-color: rgba(16, 185, 129, .1);
+    border-color: rgba(52, 211, 153, .32);
+}
+
+[data-testid="stAlert"] [data-baseweb="notification"]:has([data-testid="stAlertContentInfo"]) {
+    background-color: rgba(56, 189, 248, .08);
+    border-color: rgba(56, 189, 248, .28);
+}
+
+[data-testid="stAlert"] [data-baseweb="notification"]:has([data-testid="stAlertContentWarning"]) {
+    background-color: rgba(251, 191, 36, .09);
+    border-color: rgba(251, 191, 36, .3);
+}
+
+[data-testid="stAlert"] [data-baseweb="notification"]:has([data-testid="stAlertContentError"]) {
+    background-color: rgba(251, 113, 133, .09);
+    border-color: rgba(251, 113, 133, .32);
+}
+
+[data-testid="stToast"] {
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .4);
+}
+
+/* ---------- Code / text output ---------- */
+[data-testid="stCode"] {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+[data-testid="stCode"] pre {
+    background: #07130f !important;
+    font-size: .86rem;
+    line-height: 1.55;
 }
 
 /* Hero / branding */
@@ -236,118 +668,6 @@ div[data-testid="stToolbar"] {
     letter-spacing: .8px;
 }
 
-/* Premium metric cards */
-div[data-testid="stMetric"] {
-    padding: 1.1rem 1.2rem;
-    border-radius: 18px;
-    border: 1px solid var(--border);
-    background: linear-gradient(145deg,
-                rgba(25,39,62,.88), rgba(15,24,41,.92));
-    box-shadow: 0 9px 28px rgba(0,0,0,.13);
-    transition: transform .25s ease,
-                border-color .25s ease,
-                box-shadow .25s ease;
-}
-
-div[data-testid="stMetric"]:hover {
-    transform: translateY(-4px);
-    border-color: rgba(101,245,192,.48);
-    box-shadow: 0 13px 34px rgba(0,0,0,.2),
-                0 0 20px rgba(101,245,192,.055);
-}
-
-div[data-testid="stMetricLabel"] {
-    color: var(--muted);
-}
-
-div[data-testid="stMetricValue"] {
-    color: #fff;
-    font-weight: 800;
-    letter-spacing: -.6px;
-}
-
-/* Buttons */
-.stButton > button,
-.stDownloadButton > button {
-    min-height: 43px;
-    border-radius: 12px;
-    border: 1px solid rgba(167,190,220,.2);
-    font-weight: 650;
-    transition: transform .2s ease,
-                box-shadow .2s ease,
-                border-color .2s ease;
-}
-
-.stButton > button:hover,
-.stDownloadButton > button:hover {
-    transform: translateY(-2px);
-    border-color: rgba(101,245,192,.7);
-    box-shadow: 0 5px 22px rgba(101,245,192,.1);
-}
-
-.stButton > button:focus-visible,
-.stDownloadButton > button:focus-visible {
-    outline: 2px solid var(--mint);
-    outline-offset: 3px;
-}
-
-/* Inputs */
-.stTextInput input,
-.stTextArea textarea,
-.stSelectbox [data-baseweb="select"],
-.stMultiSelect [data-baseweb="select"] {
-    border-radius: 11px;
-}
-
-.stTextInput input:focus,
-.stTextArea textarea:focus {
-    border-color: var(--mint);
-    box-shadow: 0 0 0 1px rgba(101,245,192,.18);
-}
-
-/* Tabs */
-button[data-baseweb="tab"] {
-    font-weight: 650;
-    transition: color .2s ease;
-}
-
-button[data-baseweb="tab"][aria-selected="true"] {
-    color: var(--mint);
-}
-
-div[data-baseweb="tab-highlight"] {
-    background: linear-gradient(90deg, var(--mint), var(--violet));
-    height: 3px;
-    border-radius: 99px;
-}
-
-/* Data tables and upload area */
-[data-testid="stDataFrame"],
-[data-testid="stDataEditor"] {
-    border: 1px solid var(--border);
-    border-radius: 15px;
-    overflow: hidden;
-}
-
-[data-testid="stExpander"] {
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: rgba(16,25,43,.45);
-}
-
-[data-testid="stFileUploader"] {
-    padding: 10px;
-    border: 1px dashed rgba(101,245,192,.4);
-    border-radius: 16px;
-    background: rgba(101,245,192,.035);
-    transition: border-color .2s ease,
-                background .2s ease;
-}
-
-[data-testid="stFileUploader"]:hover {
-    border-color: var(--mint);
-    background: rgba(101,245,192,.065);
-}
 /* Stabilize the main page while scrolling */
 [data-testid="stAppViewContainer"] {
     overflow-x: hidden;
@@ -369,7 +689,22 @@ header[data-testid="stHeader"] {
     background: #090e1b !important;
     box-shadow: none !important;
 }
-/* Charts */
+/* ---------- Charts ---------- */
+[data-testid="stPlotlyChart"] {
+    padding: .4rem .5rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background-color: var(--surface);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
+    overflow: hidden;
+    transition: border-color .22s ease, box-shadow .22s ease;
+}
+
+[data-testid="stPlotlyChart"]:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, .26);
+}
+
 .js-plotly-plot .plotly .modebar {
     opacity: .65;
     transition: opacity .2s ease;
@@ -380,11 +715,44 @@ header[data-testid="stHeader"] {
 }
 
 .small-note {
-    color: #91a2bd;
+    color: var(--muted);
     font-size: .86rem;
     text-align: center;
     padding-top: 1.2rem;
     letter-spacing: .15px;
+}
+
+/* ---------- Gentle appearance transition ---------- */
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+}
+
+[data-testid="stTabs"] [role="tabpanel"] {
+    animation: fade-up .28s var(--ease) backwards;
+}
+
+/* ---------- Responsive refinements ---------- */
+@media (max-width: 900px) {
+    div[data-testid="stMetric"] {
+        padding: .9rem 1rem;
+    }
+
+    [data-testid="stMarkdownContainer"]:not(:has(.hero)) h3,
+    [data-testid="stHeading"] h3 {
+        font-size: 1.15rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .stButton > button,
+    .stDownloadButton > button {
+        min-height: 46px;
+    }
+
+    button[data-baseweb="tab"] {
+        padding: .55rem .75rem;
+    }
 }
 
 @keyframes hero-enter {
@@ -704,6 +1072,25 @@ def analysis_pdf_bytes(report_text, df, sheet_name, include_stats, include_quali
 
 def numeric_columns(df: pd.DataFrame) -> list[str]:
     return list(df.select_dtypes(include="number").columns)
+
+def style_figure(fig):
+    """Apply the emerald visual theme to a Plotly figure (appearance only)."""
+    grid = "rgba(167, 243, 208, 0.08)"
+    axis_line = "rgba(167, 243, 208, 0.20)"
+    fig.update_layout(
+        template="plotly_dark",
+        colorway=CHART_COLORWAY,
+        paper_bgcolor="#0b1a15",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif", size=13, color="#c9ddd4"),
+        title_font=dict(size=18, color="#ecf6f1"),
+        legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=12, color="#c9ddd4")),
+        hoverlabel=dict(bgcolor="#0e1e1a", bordercolor="#34d399", font=dict(size=12, color="#ecf6f1")),
+        margin=dict(l=20, r=20, t=60, b=20),
+    )
+    fig.update_xaxes(gridcolor=grid, zerolinecolor=axis_line, linecolor=axis_line)
+    fig.update_yaxes(gridcolor=grid, zerolinecolor=axis_line, linecolor=axis_line)
+    return fig
 
 def get_ai_plan(prompt: str, df: pd.DataFrame, api_key: str, model: str) -> dict[str, Any]:
     """Ask Gemini for a constrained JSON action plan; only allow-listed actions are executed."""
@@ -1114,12 +1501,7 @@ with chart_tab:
                             title=spec.get("title")
                         )
 
-                    fig.update_layout(
-                        template="plotly_dark",
-                        paper_bgcolor="rgba(0,0,0,0)",
-                        plot_bgcolor="rgba(0,0,0,0)",
-                        margin=dict(l=20, r=20, t=60, b=20)
-                    )
+                style_figure(fig)
 
                 st.plotly_chart(fig, use_container_width=True)
                 st.download_button("Download chart data (CSV)", chart_df.to_csv(index=False).encode("utf-8-sig"), file_name="chart_data.csv", mime="text/csv")
@@ -1200,7 +1582,7 @@ with analyze_tab:
         if len(nums) >= 2:
             corr = df[nums].corr(numeric_only=True)
             fig = px.imshow(corr, text_auto=True, color_continuous_scale="RdBu_r", zmin=-1, zmax=1, title="Numeric column correlations")
-            fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+            style_figure(fig)
             st.plotly_chart(fig, use_container_width=True)
         else: st.caption("Add at least two numeric columns to view correlations.")
 
