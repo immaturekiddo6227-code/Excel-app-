@@ -76,6 +76,7 @@ st.markdown("""
     --ring: rgba(52, 211, 153, .32);
     --font: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
     --ease: cubic-bezier(.2, .7, .2, 1);
+    color-scheme: dark;
 }
 
 .stApp {
@@ -87,6 +88,16 @@ st.markdown("""
         linear-gradient(90deg, rgba(167, 243, 208, .018) 1px, transparent 1px),
         var(--bg);
     background-size: auto, auto, 34px 34px, 34px 34px, auto;
+}
+
+/* Keep the dark emerald canvas visible whatever the device or Streamlit theme is */
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"] {
+    background: transparent;
+}
+
+[data-testid="stSidebar"] {
+    color: var(--text);
 }
 
 ::selection {
@@ -222,6 +233,103 @@ div[data-testid="stToolbar"] {
     border-color: var(--border);
 }
 
+/* ---------- Theme-proof text colours ----------
+   The app always uses its dark emerald palette, so every text-bearing
+   widget gets an explicit light colour. Text stays readable even when
+   the device, browser or Streamlit itself is in light mode. */
+[data-testid="stMarkdownContainer"]:not(:has(.hero)),
+[data-testid="stMarkdownContainer"]:not(:has(.hero)) :is(p, li, em, td, th) {
+    color: inherit;
+}
+
+[data-testid="stWidgetLabel"],
+[data-testid="stWidgetLabel"] label {
+    color: var(--text-2);
+}
+
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea {
+    color: var(--text);
+    caret-color: var(--emerald-400);
+}
+
+[data-testid="stSelectbox"] [data-baseweb="select"] :is(div, span, input),
+[data-testid="stMultiSelect"] [data-baseweb="select"] :is(div, span, input) {
+    color: var(--text);
+}
+
+[data-baseweb="select"] svg {
+    color: var(--muted);
+    fill: var(--muted);
+}
+
+[data-baseweb="select"] input::placeholder {
+    color: var(--muted);
+}
+
+[data-baseweb="popover"] > div,
+[data-baseweb="popover"] [data-baseweb="menu"],
+[data-baseweb="popover"] ul[role="listbox"] {
+    background-color: var(--surface-2);
+}
+
+[data-baseweb="popover"] :is(li, [role="option"], [role="option"] *) {
+    color: var(--text);
+}
+
+[data-testid="stCheckbox"] label,
+[data-testid="stRadio"] label,
+[data-testid="stExpander"] summary {
+    color: var(--text);
+}
+
+[data-testid="stCheckbox"] label *,
+[data-testid="stRadio"] label *,
+[data-testid="stExpander"] summary * {
+    color: inherit;
+}
+
+[data-testid="stFileUploader"] {
+    color: var(--text-2);
+}
+
+[data-testid="stFileUploader"] :is(span, p, div, section, li, label) {
+    color: inherit;
+}
+
+[data-testid="stFileUploader"] small {
+    color: var(--muted);
+}
+
+[data-testid="stAlert"],
+[data-testid="stToast"] {
+    color: var(--text);
+}
+
+[data-testid="stAlert"] :is(p, span, div, li, strong, code),
+[data-testid="stToast"] :is(p, span, div) {
+    color: inherit;
+}
+
+div[data-testid="stMetricLabel"] *,
+div[data-testid="stMetricValue"] * {
+    color: inherit;
+}
+
+/* Header controls (sidebar toggle, toolbar, menu) stay readable on the dark canvas */
+[data-testid="stSidebarCollapsedControl"] :is(button, span, svg),
+[data-testid="stSidebarCollapseButton"] :is(button, span, svg),
+[data-testid="stToolbar"] :is(button, a, span, svg, p) {
+    color: var(--text-2);
+}
+
+[data-testid="stSidebarCollapsedControl"] button:hover,
+[data-testid="stSidebarCollapseButton"] button:hover,
+[data-testid="stToolbar"] button:hover {
+    color: var(--mint-200);
+    background-color: rgba(16, 185, 129, .1);
+}
+
 /* ---------- Metric cards ---------- */
 div[data-testid="stMetric"] {
     padding: 1.05rem 1.2rem;
@@ -312,7 +420,9 @@ div[data-testid="stMetricValue"] {
 
 .stButton > button:disabled,
 .stDownloadButton > button:disabled {
-    opacity: .45;
+    color: var(--muted);
+    background: rgba(255, 255, 255, .02);
+    border-color: var(--border);
     cursor: not-allowed;
     box-shadow: none;
 }
@@ -554,10 +664,16 @@ div[data-baseweb="tab-highlight"] {
     overflow: hidden;
 }
 
-[data-testid="stCode"] pre {
+[data-testid="stCode"] pre,
+[data-testid="stCode"] code {
     background: #07130f !important;
+    color: var(--text-2) !important;
     font-size: .86rem;
     line-height: 1.55;
+}
+
+[data-testid="stCode"] code span {
+    color: inherit !important;
 }
 
 /* Hero / branding */
@@ -966,6 +1082,16 @@ footer {
 :root[data-theme="light"] :is(button, input, textarea, select):focus-visible {
     outline-color: var(--emerald-400);
 }
+
+/* Labels inside buttons and tabs follow the button colour (not the forced paragraph colour) */
+:root[data-theme="light"] .stButton > button[kind="primary"] p,
+:root[data-theme="light"] .stButton > button[data-testid="stBaseButton-primary"] p {
+    color: #04140d !important;
+}
+
+:root[data-theme="light"] button[data-baseweb="tab"] p {
+    color: inherit !important;
+}
 /* Keep the hero box compact on mobile */
 @media (max-width: 640px) {
     .hero {
@@ -1217,12 +1343,18 @@ def style_figure(fig):
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif", size=13, color="#c9ddd4"),
         title_font=dict(size=18, color="#ecf6f1"),
-        legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=12, color="#c9ddd4")),
+        legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=12, color="#c9ddd4"),
+                    title_font=dict(color="#c9ddd4")),
+        coloraxis_colorbar=dict(tickfont=dict(color="#c9ddd4"), title_font=dict(color="#c9ddd4")),
         hoverlabel=dict(bgcolor="#0e1e1a", bordercolor="#34d399", font=dict(size=12, color="#ecf6f1")),
         margin=dict(l=20, r=20, t=60, b=20),
     )
-    fig.update_xaxes(gridcolor=grid, zerolinecolor=axis_line, linecolor=axis_line)
-    fig.update_yaxes(gridcolor=grid, zerolinecolor=axis_line, linecolor=axis_line)
+    tick = dict(size=12, color="#c9ddd4")
+    axis_title = dict(size=13, color="#c9ddd4")
+    fig.update_xaxes(gridcolor=grid, zerolinecolor=axis_line, linecolor=axis_line,
+                     tickfont=tick, title_font=axis_title)
+    fig.update_yaxes(gridcolor=grid, zerolinecolor=axis_line, linecolor=axis_line,
+                     tickfont=tick, title_font=axis_title)
     return fig
 
 def get_ai_plan(prompt: str, df: pd.DataFrame, api_key: str, model: str) -> dict[str, Any]:
@@ -1636,7 +1768,7 @@ with chart_tab:
 
                 style_figure(fig)
 
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, use_container_width=True, theme=None)
                 st.download_button("Download chart data (CSV)", chart_df.to_csv(index=False).encode("utf-8-sig"), file_name="chart_data.csv", mime="text/csv")
 
                 st.download_button(
@@ -1716,7 +1848,7 @@ with analyze_tab:
             corr = df[nums].corr(numeric_only=True)
             fig = px.imshow(corr, text_auto=True, color_continuous_scale="RdBu_r", zmin=-1, zmax=1, title="Numeric column correlations")
             style_figure(fig)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, theme=None)
         else: st.caption("Add at least two numeric columns to view correlations.")
 
 with ai_tab:
