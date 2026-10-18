@@ -818,21 +818,117 @@ header[data-testid="stHeader"] {
         scroll-behavior: auto !important;
     }
 }
-/* Hide Streamlit top toolbar and menu */
+/* Keep Streamlit header visible so the sidebar toggle works */
 header[data-testid="stHeader"] {
-    display: none !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
+/* Keep the toolbar and sidebar controls available */
 div[data-testid="stToolbar"] {
-    display: none !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 1001 !important;
 }
 
+/* Keep sidebar open/close controls visible */
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="stSidebarCollapseButton"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Hide only unnecessary decoration and footer */
 [data-testid="stDecoration"],
 #MainMenu,
 footer {
     display: none !important;
 }
+/* ---------- Light mode readability fixes ---------- */
+:root[data-theme="light"] {
+    --bg: #f5f8f6;
+    --surface: #ffffff;
+    --surface-2: #eef4f0;
+    --border: rgba(20, 83, 45, 0.16);
+    --border-strong: rgba(5, 150, 105, 0.42);
+    --text: #17251e;
+    --text-2: #34483c;
+    --muted: #52665a;
+    --ring: rgba(16, 185, 129, 0.20);
+}
 
+/* Main app background and text */
+:root[data-theme="light"] .stApp {
+    color: var(--text) !important;
+    background-color: var(--bg) !important;
+}
+
+/* Headings and bold text */
+:root[data-theme="light"] [data-testid="stMarkdownContainer"]:not(:has(.hero)) h3,
+:root[data-theme="light"] [data-testid="stHeading"] h3,
+:root[data-theme="light"] [data-testid="stMarkdownContainer"]:not(:has(.hero)) strong {
+    color: var(--text) !important;
+}
+
+/* Rows, Columns, Missing cells and Duplicate rows cards */
+:root[data-theme="light"] div[data-testid="stMetric"] {
+    background: linear-gradient(150deg, #ffffff, #edf5f0) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+    box-shadow: 0 4px 16px rgba(20, 60, 40, 0.08) !important;
+}
+
+:root[data-theme="light"] div[data-testid="stMetricLabel"],
+:root[data-theme="light"] div[data-testid="stMetricLabel"] p,
+:root[data-theme="light"] [data-testid="stMetricValue"],
+:root[data-theme="light"] [data-testid="stMetricValue"] div {
+    color: var(--text) !important;
+}
+
+/* Sidebar */
+:root[data-theme="light"] [data-testid="stSidebar"] {
+    background: linear-gradient(170deg, #f0f8f3 0%, #ffffff 80%) !important;
+    border-right-color: var(--border) !important;
+}
+
+:root[data-theme="light"] [data-testid="stSidebar"] [data-testid="stHeading"] h3,
+:root[data-theme="light"] [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
+    color: #17633f !important;
+}
+
+/* Expanders */
+:root[data-theme="light"] [data-testid="stExpander"] {
+    background: #ffffff !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+/* Data tables: keep the container clear in light mode */
+:root[data-theme="light"] [data-testid="stDataFrame"],
+:root[data-theme="light"] [data-testid="stDataEditor"] {
+    border-color: var(--border) !important;
+    box-shadow: 0 4px 16px rgba(20, 60, 40, 0.06) !important;
+}
+
+/* Tabs */
+:root[data-theme="light"] button[data-baseweb="tab"] {
+    color: #52665a !important;
+}
+
+:root[data-theme="light"] button[data-baseweb="tab"][aria-selected="true"] {
+    color: #087f5b !important;
+}
+
+/* Links */
+:root[data-theme="light"] [data-testid="stMarkdownContainer"]:not(:has(.hero)) a,
+:root[data-theme="light"] [data-testid="stCaptionContainer"] a {
+    color: #087f5b !important;
+}
 /* Keep the hero box compact on mobile */
 @media (max-width: 640px) {
     .hero {
