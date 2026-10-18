@@ -986,7 +986,7 @@ with st.sidebar:
 
     model = st.text_input(
         "Gemini model",
-        value="gemini-2.5-flash"
+        value="gemini-3.8-flash"
     )
 
     st.caption(
