@@ -849,85 +849,122 @@ div[data-testid="stToolbar"] {
 footer {
     display: none !important;
 }
-/* ---------- Light mode readability fixes ---------- */
+
+/* ---------- Consistent emerald theme in every device mode ---------- */
+
+/* Keep the existing dark emerald palette even when the device is in light mode */
 :root[data-theme="light"] {
-    --bg: #f5f8f6;
-    --surface: #ffffff;
-    --surface-2: #eef4f0;
-    --border: rgba(20, 83, 45, 0.16);
-    --border-strong: rgba(5, 150, 105, 0.42);
-    --text: #17251e;
-    --text-2: #34483c;
-    --muted: #52665a;
-    --ring: rgba(16, 185, 129, 0.20);
+    color-scheme: dark;
+    --bg: #06100d;
+    --surface: #0b1a15;
+    --surface-2: #0e1e1a;
+    --border: rgba(167, 243, 208, .13);
+    --border-strong: rgba(110, 231, 183, .34);
+    --text: #ecf6f1;
+    --text-2: #c9ddd4;
+    --muted: #b4c9bf;
+    --ring: rgba(52, 211, 153, .32);
 }
 
-/* Main app background and text */
+/* Keep the app background greenish and all standard text readable */
 :root[data-theme="light"] .stApp {
     color: var(--text) !important;
-    background-color: var(--bg) !important;
+    color-scheme: dark;
 }
 
-/* Headings and bold text */
-:root[data-theme="light"] [data-testid="stMarkdownContainer"]:not(:has(.hero)) h3,
-:root[data-theme="light"] [data-testid="stHeading"] h3,
-:root[data-theme="light"] [data-testid="stMarkdownContainer"]:not(:has(.hero)) strong {
+/* Main content, paragraphs, headings, lists and bold text */
+:root[data-theme="light"] [data-testid="stMain"],
+:root[data-theme="light"] [data-testid="stMarkdownContainer"],
+:root[data-theme="light"] [data-testid="stMarkdownContainer"] p,
+:root[data-theme="light"] [data-testid="stMarkdownContainer"] li,
+:root[data-theme="light"] [data-testid="stMarkdownContainer"] h1,
+:root[data-theme="light"] [data-testid="stMarkdownContainer"] h2,
+:root[data-theme="light"] [data-testid="stMarkdownContainer"] h3,
+:root[data-theme="light"] [data-testid="stMarkdownContainer"] strong,
+:root[data-theme="light"] [data-testid="stHeading"] {
     color: var(--text) !important;
 }
 
-/* Rows, Columns, Missing cells and Duplicate rows cards */
-:root[data-theme="light"] div[data-testid="stMetric"] {
-    background: linear-gradient(150deg, #ffffff, #edf5f0) !important;
-    border-color: var(--border) !important;
+/* Sidebar text and headings */
+:root[data-theme="light"] [data-testid="stSidebar"] {
+    background: linear-gradient(170deg, #0c1c17 0%, #07130f 80%) !important;
     color: var(--text) !important;
-    box-shadow: 0 4px 16px rgba(20, 60, 40, 0.08) !important;
 }
 
-:root[data-theme="light"] div[data-testid="stMetricLabel"],
-:root[data-theme="light"] div[data-testid="stMetricLabel"] p,
+:root[data-theme="light"] [data-testid="stSidebar"] p,
+:root[data-theme="light"] [data-testid="stSidebar"] label,
+:root[data-theme="light"] [data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+:root[data-theme="light"] [data-testid="stSidebar"] [data-testid="stHeading"] h3 {
+    color: var(--text) !important;
+}
+
+/* Captions and widget labels */
+:root[data-theme="light"] [data-testid="stCaptionContainer"],
+:root[data-theme="light"] [data-testid="stCaptionContainer"] p {
+    color: var(--muted) !important;
+}
+
+:root[data-theme="light"] [data-testid="stWidgetLabel"],
+:root[data-theme="light"] [data-testid="stWidgetLabel"] p {
+    color: var(--text-2) !important;
+}
+
+/* Rows, Columns, Missing cells and Duplicate rows */
+:root[data-theme="light"] [data-testid="stMetricLabel"],
+:root[data-theme="light"] [data-testid="stMetricLabel"] p {
+    color: var(--muted) !important;
+}
+
 :root[data-theme="light"] [data-testid="stMetricValue"],
 :root[data-theme="light"] [data-testid="stMetricValue"] div {
+    color: #ffffff !important;
+}
+
+/* Text inputs, text areas and selected values */
+:root[data-theme="light"] [data-testid="stTextInput"] input,
+:root[data-theme="light"] [data-testid="stTextArea"] textarea,
+:root[data-theme="light"] [data-baseweb="select"] span {
     color: var(--text) !important;
+    -webkit-text-fill-color: var(--text);
 }
 
-/* Sidebar */
-:root[data-theme="light"] [data-testid="stSidebar"] {
-    background: linear-gradient(170deg, #f0f8f3 0%, #ffffff 80%) !important;
-    border-right-color: var(--border) !important;
-}
-
-:root[data-theme="light"] [data-testid="stSidebar"] [data-testid="stHeading"] h3,
-:root[data-theme="light"] [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
-    color: #17633f !important;
-}
-
-/* Expanders */
-:root[data-theme="light"] [data-testid="stExpander"] {
-    background: #ffffff !important;
-    border-color: var(--border) !important;
-    color: var(--text) !important;
-}
-
-/* Data tables: keep the container clear in light mode */
-:root[data-theme="light"] [data-testid="stDataFrame"],
-:root[data-theme="light"] [data-testid="stDataEditor"] {
-    border-color: var(--border) !important;
-    box-shadow: 0 4px 16px rgba(20, 60, 40, 0.06) !important;
+:root[data-theme="light"] [data-testid="stTextInput"] input::placeholder,
+:root[data-theme="light"] [data-testid="stTextArea"] textarea::placeholder {
+    color: var(--muted) !important;
+    -webkit-text-fill-color: var(--muted);
 }
 
 /* Tabs */
 :root[data-theme="light"] button[data-baseweb="tab"] {
-    color: #52665a !important;
+    color: var(--muted) !important;
 }
 
 :root[data-theme="light"] button[data-baseweb="tab"][aria-selected="true"] {
-    color: #087f5b !important;
+    color: var(--mint-300) !important;
 }
 
-/* Links */
+/* Links remain mint-colored against the dark green background */
 :root[data-theme="light"] [data-testid="stMarkdownContainer"]:not(:has(.hero)) a,
 :root[data-theme="light"] [data-testid="stCaptionContainer"] a {
-    color: #087f5b !important;
+    color: var(--mint-300) !important;
+}
+
+/* Expanders and status messages */
+:root[data-theme="light"] [data-testid="stExpander"],
+:root[data-theme="light"] [data-testid="stExpander"] summary,
+:root[data-theme="light"] [data-testid="stAlert"] p {
+    color: var(--text) !important;
+}
+
+/* Keep the primary button text readable */
+:root[data-theme="light"] .stButton > button[kind="primary"],
+:root[data-theme="light"] .stButton > button[data-testid="stBaseButton-primary"] {
+    color: #04140d !important;
+}
+
+/* Keep keyboard focus clearly visible */
+:root[data-theme="light"] :is(button, input, textarea, select):focus-visible {
+    outline-color: var(--emerald-400);
 }
 /* Keep the hero box compact on mobile */
 @media (max-width: 640px) {
