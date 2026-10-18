@@ -745,16 +745,36 @@ Use only column names that exist in the supplied data context. Never invent valu
 
 Return an empty actions array only if the request cannot be performed with the available actions. Ensure every action object includes its "action" field."""
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-    resp = requests.post(url, params={"key": api_key}, json={
+    import time
+
+    payload = {
         "systemInstruction": {"parts": [{"text": system}]},
         "contents": [{"role": "user", "parts": [{"text": "DATA CONTEXT:\n" + json.dumps(context, default=str) + "\n\nUSER REQUEST:\n" + prompt}]}],
         "generationConfig": {"responseMimeType": "application/json", "temperature": 0.1}
-    }, timeout=45)
-    resp.raise_for_status()
-    data = resp.json()
-    raw = data["candidates"][0]["content"]["parts"][0]["text"]
-    return json.loads(raw)
+    }
+
+    # Try the chosen model first; if it is rate-limited, fall back to lighter models.
+    fallback_models = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
+    models_to_try = [model] + [m for m in fallback_models if m != model]
+
+    for m in models_to_try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent"
+        for attempt in range(2):
+            resp = requests.post(url, params={"key": api_key}, json=payload, timeout=45)
+            if resp.status_code in (429, 503):
+                time.sleep(3 * (attempt + 1))  # short wait, then retry once
+                continue
+            if resp.status_code == 404 and m != model:
+                break  # fallback model not available, try the next one
+            resp.raise_for_status()
+            data = resp.json()
+            raw = data["candidates"][0]["content"]["parts"][0]["text"]
+            return json.loads(raw)
+
+    raise RuntimeError(
+        "Gemini quota or rate limit reached on all models. "
+        "Please wait about a minute and try again, or check your quota in Google AI Studio."
+    )
 
 def safe_calculation(df: pd.DataFrame, expression: str) -> pd.Series:
     # Parse a restricted arithmetic expression; never use Python eval on model output.
@@ -1199,7 +1219,7 @@ with ai_tab:
         else:
             try:
                 if api_key:
-                    plan = get_ai_plan(prompt, df, api_key, model.strip() or "gemini-2.5-flash")
+                    plan = get_ai_plan(prompt, df, api_key, model.strip() or "gemini-3.8-flash")
                 else:
                     p = prompt.lower(); actions = []
                     if "duplicate" in p: actions.append({"action":"drop_duplicates"})
