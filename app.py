@@ -1126,6 +1126,231 @@ footer {
         padding: 6px 9px !important;
     }
 }
+
+/* =====================================================================
+   Universal visibility layer (works in light AND dark, any Streamlit
+   version). Newer Streamlit no longer uses Baseweb, and light mode does
+   not always set data-theme, so these rules rely only on test-ids and
+   ARIA roles and are applied unconditionally.
+   ===================================================================== */
+:root, .stApp { color-scheme: dark; }
+
+/* Metric cards: label, value, delta */
+[data-testid="stMetricLabel"],
+[data-testid="stMetricLabel"] *,
+[data-testid="stMetric"] label,
+[data-testid="stMetric"] label * {
+    color: #b4c9bf !important;
+    opacity: 1 !important;
+}
+[data-testid="stMetricValue"],
+[data-testid="stMetricValue"] * {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+[data-testid="stMetricDelta"],
+[data-testid="stMetricDelta"] * {
+    opacity: 1 !important;
+}
+
+/* Tabs (role based, so it matches old and new markup) */
+[role="tablist"] {
+    border-bottom: 1px solid rgba(167, 243, 208, .13) !important;
+    gap: .25rem;
+}
+button[role="tab"],
+[data-testid="stTab"] {
+    color: #b4c9bf !important;
+    background: transparent !important;
+    opacity: 1 !important;
+    font-weight: 600;
+    border-radius: 10px 10px 0 0;
+}
+button[role="tab"] *,
+[data-testid="stTab"] * {
+    color: inherit !important;
+    opacity: 1 !important;
+}
+button[role="tab"]:hover,
+[data-testid="stTab"]:hover {
+    color: #ecf6f1 !important;
+    background: rgba(16, 185, 129, .08) !important;
+}
+button[role="tab"][aria-selected="true"],
+[data-testid="stTab"][aria-selected="true"] {
+    color: #6ee7b7 !important;
+    border-bottom: 3px solid #34d399 !important;
+}
+[data-baseweb="tab-highlight"] {
+    background: linear-gradient(90deg, #10b981, #6ee7b7) !important;
+}
+
+/* Header toolbar: Share, star, edit, menu, sidebar toggles */
+[data-testid="stHeader"],
+[data-testid="stToolbar"],
+[data-testid="stHeader"] *,
+[data-testid="stToolbar"] *,
+[data-testid="stExpandSidebarButton"],
+[data-testid="stExpandSidebarButton"] *,
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapseButton"] *,
+[data-testid="collapsedControl"],
+[data-testid="collapsedControl"] * {
+    color: #c9ddd4 !important;
+}
+[data-testid="stHeader"] svg,
+[data-testid="stToolbar"] svg,
+[data-testid="stExpandSidebarButton"] svg,
+[data-testid="stSidebarCollapseButton"] svg,
+[data-testid="collapsedControl"] svg {
+    fill: currentColor;
+}
+[data-testid="stHeader"] button:hover,
+[data-testid="stToolbar"] button:hover {
+    background: rgba(16, 185, 129, .12) !important;
+    color: #6ee7b7 !important;
+}
+
+/* Main text containers (hero keeps its own colours) */
+[data-testid="stMain"] :is(h1, h2, h3, h4, h5, h6):not(.hero *),
+[data-testid="stSidebar"] :is(h1, h2, h3, h4, h5, h6),
+[data-testid="stHeading"],
+[data-testid="stHeading"] * {
+    color: #ecf6f1 !important;
+}
+[data-testid="stMarkdownContainer"]:not(:has(.hero)) :is(p, li, span, strong, em, td, th, label) {
+    color: inherit;
+}
+[data-testid="stMain"] [data-testid="stMarkdownContainer"]:not(:has(.hero)),
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
+    color: #ecf6f1;
+}
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] * {
+    color: #b4c9bf !important;
+}
+.small-note { color: #b4c9bf !important; }
+
+/* Widget labels, help icons, radios, checkboxes, toggles */
+[data-testid="stWidgetLabel"],
+[data-testid="stWidgetLabel"] *,
+[data-testid="stCheckbox"] label,
+[data-testid="stCheckbox"] label *,
+[data-testid="stRadio"] label,
+[data-testid="stRadio"] label *,
+[data-testid="stToggle"] label,
+[data-testid="stToggle"] label * {
+    color: #d7e8e0 !important;
+    opacity: 1 !important;
+}
+[data-testid="stTooltipIcon"] svg,
+[data-testid="stTooltipHoverTarget"] svg { color: #b4c9bf !important; }
+
+/* Inputs, selects and dropdowns */
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-testid="stNumberInput"] input,
+[data-testid="stSelectbox"] *,
+[data-testid="stMultiSelect"] *,
+[role="combobox"],
+[role="combobox"] * {
+    color: #ecf6f1 !important;
+    -webkit-text-fill-color: #ecf6f1;
+}
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-testid="stNumberInput"] input,
+[data-testid="stSelectbox"] [role="combobox"],
+[data-testid="stMultiSelect"] [role="combobox"],
+[data-testid="stSelectbox"] > div > div,
+[data-testid="stMultiSelect"] > div > div {
+    background-color: rgba(255, 255, 255, .045) !important;
+}
+[data-testid="stTextInput"] input::placeholder,
+[data-testid="stTextArea"] textarea::placeholder,
+[role="combobox"] input::placeholder {
+    color: #9bb3a8 !important;
+    -webkit-text-fill-color: #9bb3a8;
+    opacity: 1;
+}
+[data-testid="stSelectbox"] svg,
+[data-testid="stMultiSelect"] svg,
+[data-testid="stNumberInput"] svg,
+[data-testid="stTextInput"] svg { color: #b4c9bf !important; fill: currentColor; }
+[role="listbox"],
+[role="listbox"] ul,
+[data-testid="stSelectboxVirtualDropdown"],
+[data-testid="stSelectboxVirtualDropdown"] * {
+    background-color: #0e1e1a !important;
+}
+[role="listbox"] *,
+[role="option"],
+[role="option"] * {
+    color: #ecf6f1 !important;
+}
+[role="option"]:hover,
+[role="option"][aria-selected="true"] {
+    background-color: rgba(16, 185, 129, .18) !important;
+}
+[data-testid="stPopover"] *, [data-testid="stPopoverBody"] * { color: #ecf6f1; }
+[data-testid="stPopoverBody"] { background: #0e1e1a !important; }
+
+/* Buttons */
+.stButton > button:not([kind="primary"]):not([data-testid="stBaseButton-primary"]),
+.stDownloadButton > button,
+[data-testid="stBaseButton-secondary"] {
+    color: #ecf6f1 !important;
+}
+.stButton > button:not([kind="primary"]) *,
+.stDownloadButton > button * { color: inherit !important; }
+.stButton > button[kind="primary"],
+.stButton > button[kind="primary"] *,
+[data-testid="stBaseButton-primary"],
+[data-testid="stBaseButton-primary"] * {
+    color: #04140d !important;
+}
+
+/* Expanders */
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary * { color: #ecf6f1 !important; }
+[data-testid="stExpander"] svg { color: #b4c9bf !important; fill: currentColor; }
+
+/* File uploader */
+[data-testid="stFileUploader"] *,
+[data-testid="stFileUploaderDropzone"] * { color: #c9ddd4 !important; }
+[data-testid="stFileUploader"] small,
+[data-testid="stFileUploaderDropzoneInstructions"] small { color: #9bb3a8 !important; }
+[data-testid="stFileUploader"] button { color: #ecf6f1 !important; }
+
+/* Alerts and toasts */
+[data-testid="stAlert"],
+[data-testid="stAlert"] *,
+[data-testid="stToast"],
+[data-testid="stToast"] * { color: #ecf6f1 !important; }
+[data-testid="stAlert"] { background-color: rgba(255, 255, 255, .05) !important; }
+[data-testid="stAlert"]:has([data-testid="stAlertContentSuccess"]) { background-color: rgba(16, 185, 129, .12) !important; }
+[data-testid="stAlert"]:has([data-testid="stAlertContentInfo"]) { background-color: rgba(56, 189, 248, .10) !important; }
+[data-testid="stAlert"]:has([data-testid="stAlertContentWarning"]) { background-color: rgba(251, 191, 36, .11) !important; }
+[data-testid="stAlert"]:has([data-testid="stAlertContentError"]) { background-color: rgba(251, 113, 133, .11) !important; }
+[data-testid="stSpinner"], [data-testid="stSpinner"] * { color: #c9ddd4 !important; }
+
+/* Code, tables, dataframes */
+[data-testid="stCode"] *, [data-testid="stCodeBlock"] *, code { color: #c9ddd4; }
+[data-testid="stMarkdownContainer"] table :is(th, td) { color: #ecf6f1 !important; }
+[data-testid="stDataFrame"] { color-scheme: dark; }
+
+/* Links */
+[data-testid="stMain"] [data-testid="stMarkdownContainer"]:not(:has(.hero)) a { color: #6ee7b7 !important; }
+
+/* Sidebar surface */
+[data-testid="stSidebar"] { background: linear-gradient(170deg, #0c1c17 0%, #07130f 80%) !important; }
+[data-testid="stSidebar"] label, [data-testid="stSidebar"] p { color: #ecf6f1; }
+
+/* Emerald accents instead of Streamlit's default red primary */
+[data-testid="stCheckbox"] input:checked + div,
+[data-testid="stToggle"] input:checked + div { background-color: #10b981 !important; border-color: #10b981 !important; }
+input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color: #10b981; }
+:focus-visible { outline-color: #34d399; }
 </style>
 
 <div class="hero">
